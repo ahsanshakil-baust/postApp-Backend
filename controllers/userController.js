@@ -7,7 +7,6 @@ const crypto = require("crypto");
 // internal imports
 const environment = require("../helpers/environment");
 const User = require("../model/User");
-const { sendMail } = require("../utilities/sendMail");
 
 // Register a user
 const addUser = async (req, res) => {
@@ -28,26 +27,13 @@ const addUser = async (req, res) => {
             token: crypto.randomBytes(64).toString("hex"),
         });
         try {
-            // send verification mail to user
-            const result = await sendMail(req, user);
+            // save the user to the database
+            await user.save();
 
-            // check if mail is sending
-            if (result) {
-                // save the user to the database
-                await user.save();
-
-                // notify to verify the email
-                res.status(200).json({
-                    msg: "Verification sent to your email account.",
-                });
-            } else {
-                // not sending error
-                res.status(500).json({
-                    errors: {
-                        common: { msg: "can not send mail!" },
-                    },
-                });
-            }
+            // notify to verify the email
+            res.status(200).json({
+                msg: "SignUp Complete.",
+            });
         } catch (err) {
             // server error
             res.status(500).json({
@@ -71,7 +57,7 @@ const getUser = async (req, res) => {
     try {
         // Find registered user by their email and mobile
         const user = await User.findOne({
-            $or: [{ email: req.body.email }, { mobile: req.body.mobile }],
+            email: req.body.email,
         });
         // checking is there any user and also there id
         if (user && user._id) {
@@ -82,35 +68,23 @@ const getUser = async (req, res) => {
             );
             // is matching finded user password tothe given body password then passed throw
             if (isValidPassword) {
-                const isVerified = user.isVerify;
+                // create token object to generate a token for a particular user
+                const tokenObject = {
+                    id: user._id,
+                };
 
-                // check is user verified its account by their email
-                if (isVerified) {
-                    // create token object to generate a token for a particular user
-                    const tokenObject = {
-                        id: user._id,
-                    };
-
-                    // generating a token by token object to pass it to the cookie
-                    const token = jwt.sign(tokenObject, environment.token, {
-                        expiresIn: "1d",
-                    });
-                    // sending a signed cookie with token
-                    res.cookie(environment.cookie_name, token, {
-                        maxAge: 86400000,
-                        httpOnly: true,
-                        signed: true,
-                    });
-                    // user information passed as json
-                    res.status(200).json({ user: user });
-                } else {
-                    // if email verification not done then it will be fireing
-                    res.status(500).json({
-                        errors: {
-                            common: { msg: "Email not verified!" },
-                        },
-                    });
-                }
+                // generating a token by token object to pass it to the cookie
+                const token = jwt.sign(tokenObject, environment.token, {
+                    expiresIn: "1d",
+                });
+                // sending a signed cookie with token
+                res.cookie(environment.cookie_name, token, {
+                    maxAge: 86400000,
+                    httpOnly: true,
+                    signed: true,
+                });
+                // user information passed as json
+                res.status(200).json({ user: user });
             } else {
                 // user error
                 throw createError("Provide your information correctly!");
@@ -159,48 +133,10 @@ const logout = (req, res) => {
     res.send("loggedout");
 };
 
-// verify email
-const verifyEmail = async (req, res) => {
-    try {
-        // get the token by query
-        const token = req.params.token;
-        // find the user by given token to the user
-        const user = await User.findOne({ token });
-        // check is the user exists
-        if (user) {
-            // update the user token null
-            user.token = null;
-            // also update isVerify true
-            user.isVerify = true;
-            // save the user to the database
-            await user.save();
-            // giving a success response
-            res.status(200).json({
-                msg: "verified!",
-            });
-        } else {
-            // Server Error
-            res.status(500).json({
-                errors: {
-                    common: { msg: "Email is not verified" },
-                },
-            });
-        }
-    } catch (err) {
-        // Server Error
-        res.status(500).json({
-            errors: {
-                common: { msg: err.message },
-            },
-        });
-    }
-};
-
 // exporting modules
 module.exports = {
     addUser,
     getUser,
-    verifyEmail,
     loggedInUser,
     logout,
 };

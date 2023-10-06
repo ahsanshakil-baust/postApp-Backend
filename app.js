@@ -7,7 +7,6 @@ const path = require("path");
 // intenal imports
 const environment = require("./helpers/environment");
 const userRouter = require("./routes/userRouter");
-const adminRouter = require("./routes/adminRouter");
 const {
     notFoundHandler,
     errorHandler,
@@ -35,9 +34,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // user
 app.use("/user", userRouter);
-
-//admin
-app.use("/admin", adminRouter);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {

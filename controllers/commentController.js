@@ -9,8 +9,6 @@ const addNewComment = async (req, res) => {
     // getting data from New Post
     const { commentText, name, email } = req.body;
 
-    console.log(commentText, name, email, postId);
-
     try {
         const post = await Post.findById(postId);
 

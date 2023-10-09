@@ -32,7 +32,7 @@ const app = express();
 app.use(cookieParser(environment.cookie));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({ credentials: true }));
 
 // Routes
 

@@ -109,6 +109,7 @@ const getUser = async (req, res) => {
 const loggedInUser = async (req, res) => {
     // Find registered user by their id
     const userlog = await User.findById(req.user.id).select("-password");
+
     if (userlog) {
         // user info response
         res.status(200).json({

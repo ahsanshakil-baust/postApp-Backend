@@ -82,6 +82,8 @@ const getUser = async (req, res) => {
                     maxAge: 86400000,
                     httpOnly: true,
                     signed: true,
+                    secure: true,
+                    sameSite: "None",
                 });
                 // user information passed as json
                 res.status(200).json({ user: user });

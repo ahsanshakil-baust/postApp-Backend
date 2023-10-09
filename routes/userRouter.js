@@ -31,7 +31,7 @@ router.post("/signup", inputValidator, inputValidatorHandler, addUser);
 router.post("/login", loginValidator, loginValidatorHandler, getUser);
 
 // get loggedin user
-router.get("/", checkLogin, loggedInUser);
+// router.get("/", checkLogin, loggedInUser);
 
 // logout user
 router.delete("/logout", logout);

@@ -87,10 +87,8 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // connection log
-app.listen(process.env.PORT || 5000, () => {
+app.listen(process.env.PORT, () => {
     console.log(
-        `Server running on ${process.env.PORT || 5000} on mode ${
-            process.env.NODE_ENV
-        }`
+        `Server running on ${process.env.PORT} on mode ${process.env.NODE_ENV}`
     );
 });

@@ -43,6 +43,13 @@ app.use("/post", postRouter);
 // Comments
 app.use("/comment", commentRouter);
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
     // Set static folder

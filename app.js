@@ -3,6 +3,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
+const cors = require("cors");
 
 // intenal imports
 const environment = require("./helpers/environment");
@@ -31,6 +32,7 @@ const app = express();
 app.use(cookieParser(environment.cookie));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Routes
 
@@ -45,10 +47,10 @@ app.use("/comment", commentRouter);
 
 // Middleware to handle CORS
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Origin", "*");
     res.header(
         "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+        "GET, POST, OPTIONS, PUT, PATCH, DELETE,HEAD"
     );
     res.header(
         "Access-Control-Allow-Headers",
@@ -87,8 +89,10 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // connection log
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
     console.log(
-        `Server running on ${process.env.PORT} on mode ${process.env.NODE_ENV}`
+        `Server running on ${process.env.PORT || 5000} on mode ${
+            process.env.NODE_ENV
+        }`
     );
 });

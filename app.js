@@ -33,7 +33,13 @@ app.use(cookieParser(environment.cookie));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
-    cors({ credentials: true, origin: "https://post-app-frontend.vercel.app" })
+    cors({
+        credentials: true,
+        origin: [
+            "http://localhost:3000",
+            "https://post-app-frontend.vercel.app",
+        ],
+    })
 );
 
 // Routes
@@ -46,29 +52,6 @@ app.use("/post", postRouter);
 
 // Comments
 app.use("/comment", commentRouter);
-
-// Middleware to handle CORS
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, OPTIONS, PUT, PATCH, DELETE,HEAD"
-    );
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-
-    // Allow credentials (if your frontend and backend share cookies, sessions, etc.)
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    // Handle preflight requests
-    if (req.method === "OPTIONS") {
-        res.sendStatus(200);
-    } else {
-        next();
-    }
-});
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
